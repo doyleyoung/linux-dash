@@ -8,11 +8,15 @@ digCmd=`which dig`
 
 externalIp=`$digCmd +short myip.opendns.com @resolver1.opendns.com`
 
-echo -n "["
+result=""
 
-for item in $($ifconfigCmd | $grepCmd -oP "^[a-zA-Z0-9:]*(?=:)")
+result+="["
+
+for item in $($ifconfigCmd | $grepCmd -oP "^([a-zA-Z0-9\-]+)")
 do 
-    echo -n "{\"interface\" : \""$item"\", \"ip\" : \"$( $ifconfigCmd $item | $grepCmd "inet" | $awkCmd '{match($0,"inet (addr:)?([0-9.]*)",a)}END{ if (NR != 0){print a[2]; exit}{print "none"}}')\"}, "
+    result+="{\"interface\" : \""$item"\", \"ip\" : \"$( $ifconfigCmd $item | $grepCmd "inet" | $awkCmd '{match($0,"inet\\s(addr:)(\\S+)\\s",a); print a[2]; }')\"}, "
 done
 
-echo "{ \"interface\": \"external\", \"ip\": \"$externalIp\" } ]"
+result+="{\"interface\": \"external\", \"ip\": \"$externalIp\"}]"
+
+echo "$result"

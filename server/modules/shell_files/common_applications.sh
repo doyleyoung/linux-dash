@@ -1,5 +1,5 @@
 #!/bin/bash
-result=$(whereis php node mysql mongo vim python ruby java apache2 nginx openssl vsftpd make \
+result=$(whereis java node mysql apache2 openssl php \
 | awk -F: '{if(length($2)==0) { installed="false"; } else { installed="true"; } \
 			print \
 			"{ \
